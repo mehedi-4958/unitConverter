@@ -64,98 +64,108 @@ class MyAppState extends State<MyApp> {
         ),
         body: Container(
           padding: EdgeInsets.symmetric(horizontal: 20),
-          child: Column(
-            children: [
-              Spacer(),
-              Text(
-                'Value',
-                style: labelStyle,
-              ),
-              Spacer(),
-              TextField(
-                style: inputStyle,
-                decoration: InputDecoration(
-                  hintText: 'Please insert the measure to be converted',
+          child: LayoutBuilder(builder: (context, constraint) {
+            return SingleChildScrollView(
+              child: ConstrainedBox(
+                constraints: BoxConstraints(minHeight: constraint.maxHeight),
+                child: IntrinsicHeight(
+                  child: Column(
+                    children: [
+                      Spacer(),
+                      Text(
+                        'Value',
+                        style: labelStyle,
+                      ),
+                      Spacer(),
+                      TextField(
+                        style: inputStyle,
+                        decoration: InputDecoration(
+                          hintText: 'Please insert the measure to be converted',
+                        ),
+                        onChanged: (text) {
+                          var rv = double.tryParse(text);
+                          if (rv != null) {
+                            setState(() {
+                              _numberFrom = rv;
+                            });
+                          }
+                        },
+                      ),
+                      Spacer(),
+                      Text(
+                        'From',
+                        style: labelStyle,
+                      ),
+                      Spacer(),
+                      DropdownButton(
+                        items: _measures.map((String value) {
+                          return DropdownMenuItem<String>(
+                            value: value,
+                            child: Text(value),
+                          );
+                        }).toList(),
+                        onChanged: (value) {
+                          setState(() {
+                            _startMeasure = value;
+                          });
+                        },
+                        value: _startMeasure,
+                      ),
+                      Spacer(),
+                      Text(
+                        'To',
+                        style: labelStyle,
+                      ),
+                      Spacer(),
+                      DropdownButton(
+                        items: _measures.map((String value) {
+                          return DropdownMenuItem<String>(
+                            value: value,
+                            child: Text(value),
+                          );
+                        }).toList(),
+                        onChanged: (value) {
+                          setState(() {
+                            _convertedMeasure = value;
+                          });
+                        },
+                        value: _convertedMeasure,
+                      ),
+                      Spacer(
+                        flex: 2,
+                      ),
+                      ElevatedButton(
+                        onPressed: () {
+                          if (_startMeasure.isEmpty ||
+                              _convertedMeasure.isEmpty ||
+                              _numberFrom == 0) {
+                            return;
+                          } else {
+                            convert(
+                                _numberFrom, _startMeasure, _convertedMeasure);
+                          }
+                        },
+                        child: Text(
+                          'Convert',
+                          style: inputStyle,
+                        ),
+                      ),
+                      Spacer(
+                        flex: 2,
+                      ),
+                      Text(
+                        _resultMessage,
+                        style: labelStyle,
+                      ),
+                      Spacer(
+                        flex: 8,
+                      ),
+                    ],
+                  ),
                 ),
-                onChanged: (text) {
-                  var rv = double.tryParse(text);
-                  if (rv != null) {
-                    setState(() {
-                      _numberFrom = rv;
-                    });
-                  }
-                },
               ),
-              Spacer(),
-              Text(
-                'From',
-                style: labelStyle,
-              ),
-              Spacer(),
-              DropdownButton(
-                items: _measures.map((String value) {
-                  return DropdownMenuItem<String>(
-                    value: value,
-                    child: Text(value),
-                  );
-                }).toList(),
-                onChanged: (value) {
-                  setState(() {
-                    _startMeasure = value;
-                  });
-                },
-                value: _startMeasure,
-              ),
-              Spacer(),
-              Text(
-                'To',
-                style: labelStyle,
-              ),
-              Spacer(),
-              DropdownButton(
-                items: _measures.map((String value) {
-                  return DropdownMenuItem<String>(
-                    value: value,
-                    child: Text(value),
-                  );
-                }).toList(),
-                onChanged: (value) {
-                  setState(() {
-                    _convertedMeasure = value;
-                  });
-                },
-                value: _convertedMeasure,
-              ),
-              Spacer(
-                flex: 2,
-              ),
-              ElevatedButton(
-                onPressed: () {
-                  if (_startMeasure.isEmpty ||
-                      _convertedMeasure.isEmpty ||
-                      _numberFrom == 0) {
-                    return;
-                  } else {
-                    convert(_numberFrom, _startMeasure, _convertedMeasure);
-                  }
-                },
-                child: Text(
-                  'Convert',
-                  style: inputStyle,
-                ),
-              ),
-              Spacer(
-                flex: 2,
-              ),
-              Text(
-                _resultMessage,
-                style: labelStyle,
-              ),
-              Spacer(
-                flex: 8,
-              ),
-            ],
-          ),
+            );
+          }),
         ),
       ),
     );
